@@ -35,9 +35,8 @@ jobs:
          instructions: 'Please validate the build configuration and resume'
          onTimeout: 'resume'
 - job: check_manual_intervation
+  dependsOn: waitForValidation
   displayName: Continue after manual intervention
-  pool: server    
-  timeoutInMinutes: 4320 # job times out in 3 days
   steps:   
    - bash: |
       echo "EXECUTED!"
