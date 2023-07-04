@@ -9,13 +9,36 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
+jobs:
+- job: build
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '10.x'
+    displayName: 'Install Node.js'
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
+  - script: |
+      npm install
+      npm run build
+      displayName: 'npm install and build'
+
+- job: waitForValidation
+  displayName: Wait for external validation  
+  pool: server    
+  timeoutInMinutes: 4320 # job times out in 3 days
+  steps:   
+   - task: ManualValidation@0
+     timeoutInMinutes: 1440 # task times out in 1 day
+     inputs:
+         notifyUsers: |
+            someone@example.com
+         instructions: 'Please validate the build configuration and resume'
+         onTimeout: 'resume'
+- job: check_manual_intervation
+  displayName: Continue after manual intervention
+  pool: server    
+  timeoutInMinutes: 4320 # job times out in 3 days
+  steps:   
+   - bash: |
+      echo "EXECUTED!"
+
